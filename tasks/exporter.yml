@@ -1,3 +1,8 @@
+- name: install prometheus node exporter
+  ansible.builtin.package:
+    name: prometheus-node-exporter
+    state: present
+
 - name: copy exporter script
   ansible.builtin.copy:
     src: sonoff_exporter.py
