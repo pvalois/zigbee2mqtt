@@ -1,0 +1,55 @@
+- name: install prerequesites
+  ansible.builtin.package:
+    name: 
+      - mosquitto
+      - mosquitto-clients
+      - git
+      - gcc
+      - nodejs
+    state: present
+
+- name: create /opt/zigbee2mqtt
+  ansible.builtin.file: 
+    path: "{{ installation_path }}"
+    owner: root
+    group: root
+    state: directory
+    mode: 0755
+
+- name: clone git repository
+  ansible.builtin.git:
+    repo: "{{ repository }}"
+    dest: "{{ installation_path }}"
+    depth: 1
+    force: yes
+    
+- name: npm ci && build
+  ansible.builtin.shell: |
+    npm ci
+    npm run build
+  args: 
+    chdir: "{{ installation_path }}"
+
+- name: copy configuration file
+  ansible.builtin.copy:
+    src: configuration.yaml
+    dest: "{{ installation_path }}/configuration.yaml"
+
+- name: copy service file 
+  ansible.builtin.template:
+    src: service.j2
+    dest: /etc/systemd/system/zigbee2mqtt.service
+
+- name: Force systemd to reread configs
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
+- name: enable service
+  ansible.builtin.systemd_service: 
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - mosquitto.service
+    - zigbee2mqtt.service
+  
