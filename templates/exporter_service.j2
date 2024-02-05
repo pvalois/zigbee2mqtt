@@ -1,0 +1,17 @@
+[Unit]
+Description=sonoffexporter
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=python3 /usr/local/bin/sonoff_exporter.py
+StandardOutput=inherit
+StandardError=inherit
+WatchdogSec=10s
+Restart=always
+RestartSec=10s
+User=root
+
+[Install]
+WantedBy=multi-user.target
+

@@ -1,0 +1,23 @@
+- name: copy exporter script
+  ansible.builtin.copy:
+    src: sonoff_exporter.py
+    dest: /usr/local/bin/sonoff_exporter.py
+    owner: root
+    group: root
+    mode: 0755
+
+- name: copy exporter service 
+  ansible.builtin.template:
+    src: exporter_service.j2
+    dest: /etc/systemd/system/sonoffexporter.service
+
+- name: Force systemd to reread configs
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
+- name: enable service
+  ansible.builtin.systemd_service:
+    name: sonoffexporter.service
+    enabled: yes
+    state: started
+
