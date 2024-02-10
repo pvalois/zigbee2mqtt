@@ -3,13 +3,12 @@ Description=sonoffexporter
 After=network.target
 
 [Service]
-Type=simple
-ExecStart=python3 /usr/local/bin/sonoff_exporter.py
+Type=forking
+Restart=on-failure
+RestartSec=3
+ExecStart=screen -S sonoff -d -m python3 /usr/local/bin/sonoff_exporter.py
 StandardOutput=inherit
 StandardError=inherit
-WatchdogSec=10s
-Restart=always
-RestartSec=10s
 User=root
 
 [Install]

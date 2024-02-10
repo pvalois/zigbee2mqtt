@@ -4,6 +4,7 @@ import random
 from paho.mqtt import client as mqtt_client
 import json
 from pprint import pprint
+import logging
 
 
 broker = 'localhost'
@@ -46,10 +47,21 @@ def subscribe(client: mqtt_client):
               humidity=sensors[1].split(":")[1]
               temperature=sensors[2].split(":")[1]
 
-              sensor[capt_id]={"humidity":humidity,"temperature":temperature}
-            except: 
-              print  (m)
 
+            except: 
+              pass
+
+            try:
+              oldvalue=sensor[capt_id]["temperature"]
+            except:
+              oldvalue=20.0
+
+            if (abs(float(temperature) - float(oldvalue))>10.0):
+              temperature=oldvalue
+
+            sensor[capt_id]={"humidity":humidity,"temperature":temperature}
+            print ("Sensor "+capt_id+" registered temperature of "+temperature+" and humidity of "+humidity)
+          
           with open("/var/lib/prometheus/node-exporter/sonoff.prom","w") as f:
             f.write("#TYPE sonoff_humidity gauge\n")
             for capt_id in sensor:

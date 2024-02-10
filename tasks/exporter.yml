@@ -26,3 +26,7 @@
     enabled: yes
     state: started
 
+- name: restart service
+  ansible.builtin.systemd_service:
+    name: sonoffexporter.service
+    state: restarted
